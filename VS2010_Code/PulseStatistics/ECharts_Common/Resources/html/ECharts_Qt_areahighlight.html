@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+   <head>
+       <meta charset="utf-8">
+   </head>
+
+   <body style="height: 100%; margin: 0">
+       <div id="container" style="position:relative;width:100%;height:100%;margin:0px auto;"></div>
+	   <div id ="mychar"  ></div>
+       <script type="text/javascript" src="../js/echarts/echarts.min.js"></script>
+	   <script type="text/javascript" src="../js/json/cycle.js"></script>
+	   <script type="text/javascript" src="../js/json/json_parse.js"></script>
+	   <script type="text/javascript" src="../js/json/json_parse_state.js"></script>
+	   <script type="text/javascript" src="../js/json/json2.js"></script>
+       <script type="text/javascript">
+	   
+			var dom = document.getElementById("container");
+			var myChart = echarts.init(dom);
+			var colorList = ['#4f81bd', '#c0504d', '#9bbb59', '#604a7b', '#948a54', '#e46c0b'];
+			var last_itemStyle;
+			var last_itemIndex;
+
+			function renderItem(params, api) {
+			    var yValue = api.value(2);
+			    var start = api.coord([api.value(0), yValue]);
+			    var size = api.size([api.value(1) - api.value(0), 50]);
+			    var style = api.style();
+
+			    return {
+			        type: 'rect',
+			        shape: {
+			            x: start[0],
+			            y: start[1],
+			            width: size[0],
+			            height: size[1]
+			        },
+			        style: style
+			    };
+			}
+
+			option_origin = {
+			    title: {
+			        text: 'ImpulseFrequency',
+			        left: 'center'
+			    },
+			    tooltip: {
+			    },
+			    xAxis: {
+			        scale: true,
+			        name: 'TOA'
+			    },
+			    yAxis: {
+			        scale: true,
+			        name: 'RF'
+			    },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        restore: {}
+                    }
+                },
+                dataZoom: [{
+                    type: 'inside'
+                }],
+			    series: [{
+			        type: 'custom',
+			        renderItem: renderItem,
+			        label: {
+			            normal: {
+			                show: false,
+			                position: 'top'
+			            }
+			        },
+					itemStyle: {
+						normal: {
+							color: '#19ff07'
+						}
+					},
+			        dimensions: ['start', 'end', 'RF'],
+			        encode: {
+			            x: [0, 1],
+			            y: 2,
+			            tooltip: [0, 1, 2],
+			            itemName: 3
+			        },
+			        data: []
+			    }]
+			};
+
+			function setEchartsOption(option, NotMerge) {
+			    var option_obj = JSON.parse(option);
+			    if (option_origin && typeof option_origin === "object") {
+			        if (option_obj["series"]) {
+			            var data = option_obj["series"][0]["data"];
+			            data = echarts.util.map(data, function (item, index) {
+			                var data_name = item[3];
+			                if (data_name == 'RA') {
+			                    return {
+			                        value: item,
+			                        itemStyle: {
+			                            normal: {
+			                                color: colorList[0]
+			                            }
+			                        }
+			                    }
+			                } else if (data_name == 'RB') {
+			                    return {
+			                        value: item,
+			                        itemStyle: {
+			                            normal: {
+			                                color: colorList[1]
+			                            }
+			                        }
+			                    }
+			                } else if (data_name == 'RC') {
+			                    return {
+			                        value: item,
+			                        itemStyle: {
+			                            normal: {
+			                                color: colorList[2]
+			                            }
+			                        }
+			                    }
+			                } else {
+			                    return {
+			                        value: item,
+			                        itemStyle: {
+			                            normal: {
+			                                color: colorList[3]
+			                            }
+			                        }
+			                    }
+			                };
+			            });
+			            
+				        option_origin["series"][0]["data"] = data;
+				        myChart.setOption(option_origin, NotMerge);
+	                }
+				};
+			};
+
+            function setEchartsBackgroundImage(imagePath){
+                var dom = document.getElementById("container");
+
+                dom.style.backgroundImage = 'url(' + imagePath + ')';
+                dom.style.backgroundRepeat = ' no-repeat';
+                dom.style.backgroundAttachment = 'fixed';
+                dom.style.backgroundSize = 'cover';
+
+            };
+
+            function setAFTwoValueAxesInPolarWidgetToolTipFormatter(radiusLabel,rUnit,AngleLabel,aUnit){
+                option ={
+                    tooltip:{
+                        formatter: function(params){
+                            var Label = AngleLabel + ": " + params[0].value[1] + aUnit + "<br />" + radiusLabel + ": " + params[0].value[0] + rUnit;
+
+                            return Label;
+                        }
+                    }
+                }
+
+                myChart.setOption(option,false);
+
+                return true;
+            }
+			
+			function setEChartsItemHighlight(highlight_item_index) {
+				var highlight_item_index = parseInt(highlight_item_index);
+				var data = option_origin["series"][0]["data"];	
+				var itemStartValue;
+				var itemEndValue;
+				data = echarts.util.map(data, function (item, index) {
+					if (last_itemIndex == index) {
+						return {
+							value: item.value,
+							itemStyle: last_itemStyle
+						}
+					} else {
+						return item;
+					}
+				});
+				data = echarts.util.map(data, function (item, index) {
+					if (highlight_item_index == index) {
+						last_itemIndex = highlight_item_index;
+						last_itemStyle = item.itemStyle;
+						itemStartValue = parseFloat(item.value[0]);
+						itemEndValue = parseFloat(item.value[1]);
+						return {
+							value: item.value,
+							itemStyle: {
+								normal: {
+									color: '#00ff00',
+									shadowBlur: 50,
+									shadowColor: '#fff000'
+								}
+							}
+						}
+					} else {
+						return item;
+					}
+				});
+				option_origin["series"][0]["data"] = data;
+				option_origin.xAxis.min = itemStartValue - 3*(itemEndValue-itemStartValue);
+				option_origin.xAxis.max = itemEndValue + 3*(itemEndValue-itemStartValue);
+				myChart.setOption(option_origin, false);
+            }
+			myChart.on('click', function (param) {
+				var highlight_item_index = param.dataIndex;
+				data = option_origin["series"][0]["data"];
+				data = echarts.util.map(data, function (item, index) {
+					if (last_itemIndex == index) {
+						return {
+							value: item.value,
+							itemStyle: last_itemStyle
+						}
+					} else {
+						return item;
+					}
+				});
+				
+				data = echarts.util.map(data, function (item, index) {
+					if (highlight_item_index == index) {
+						last_itemIndex = highlight_item_index;
+						last_itemStyle = data[highlight_item_index].itemStyle;
+						return {
+							value: item.value,
+							itemStyle: {
+								normal: {
+									color: '#00ff00',
+									shadowBlur: 50,
+									shadowColor: '#fff000'
+								}
+							}
+						}
+					} else {
+						return item;
+					}
+				});
+				option_origin["series"][0]["data"] = data;
+				myChart.setOption(option_origin, false);
+				
+				mainWindow.HighlightQTableItem(highlight_item_index);
+            });
+       </script>
+   </body>
+</html>

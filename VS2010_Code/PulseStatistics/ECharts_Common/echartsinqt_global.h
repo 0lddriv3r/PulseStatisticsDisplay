@@ -1,0 +1,12 @@
+#ifndef ECHARTSINQT_GLOBAL_H
+#define ECHARTSINQT_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#ifdef ECHARTS_COMMON_LIB
+# define ECHARTS_COMMON_EXPORT Q_DECL_EXPORT
+#else
+# define ECHARTS_COMMON_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // ECHARTSINQT_GLOBAL_H

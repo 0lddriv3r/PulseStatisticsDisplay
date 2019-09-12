@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>html/ECharts_Qt.html</file>
+        <file>html/ECharts_Scatter.html</file>
+        <file>js/echarts/echarts.js</file>
+        <file>js/echarts/echarts.min.js</file>
+        <file>js/json/cycle.js</file>
+        <file>js/json/json_parse.js</file>
+        <file>js/json/json_parse_state.js</file>
+        <file>js/json/json2.js</file>
+    </qresource>
+</RCC>

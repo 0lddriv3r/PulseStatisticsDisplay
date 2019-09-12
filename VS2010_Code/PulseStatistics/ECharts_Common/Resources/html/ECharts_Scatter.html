@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+   <head>
+       <meta charset="utf-8">
+   </head>
+
+   <body style="height: 100%; margin: 0">
+       <div id="container_RF" style="position:relative;width:100%;height:139px;margin:0px auto;"></div>
+	   <div id="container_PRI" style="position:relative;width:100%;height:139px;margin:0px auto;"></div>
+	   <div id="container_PW" style="position:relative;width:100%;height:139px;margin:0px auto;"></div>
+	   <div id="container_DOA" style="position:relative;width:100%;height:139px;margin:0px auto;"></div>
+	   <div id="container_PA" style="position:relative;width:100%;height:139px;margin:0px auto;"></div>
+       <script type="text/javascript" src="../js/echarts/echarts.min.js"></script>
+	   <script type="text/javascript" src="../js/json/cycle.js"></script>
+	   <script type="text/javascript" src="../js/json/json_parse.js"></script>
+	   <script type="text/javascript" src="../js/json/json_parse_state.js"></script>
+	   <script type="text/javascript" src="../js/json/json2.js"></script>
+       <script type="text/javascript">
+	   
+			var dom_RF = document.getElementById("container_RF");
+			var myChart_RF = echarts.init(dom_RF);
+			var dom_PRI = document.getElementById("container_PRI");
+			var myChart_PRI = echarts.init(dom_PRI);
+			var dom_PW = document.getElementById("container_PW");
+			var myChart_PW = echarts.init(dom_PW);
+			var dom_DOA = document.getElementById("container_DOA");
+			var myChart_DOA = echarts.init(dom_DOA);
+			var dom_PA = document.getElementById("container_PA");
+			var myChart_PA = echarts.init(dom_PA);
+
+			option_origin_RF = {
+			    backgroundColor: '#000000',
+				tooltip: {
+			    },
+			    xAxis: {
+			        scale: true,
+					splitLine: {
+						show: false
+					},
+					axisLine: {
+						lineStyle: {
+							color: '#ffffff',
+							witdh: 5
+						}
+					},
+					axisTick: {
+						show: false
+					},
+					axisLabel: {
+						show: false
+					},
+			        name: ''
+			    },
+			    yAxis: {
+			        scale: true,
+					splitLine: {
+						show: false
+					},
+					axisLine: {
+						lineStyle: {
+							color: '#ffffff',
+							witdh: 5
+						}
+					},
+					nameLocation: 'center',
+                    nameGap: 50,
+                    name: 'RF(MHz)'
+			    },
+                grid: {
+                    height: 60
+                },
+                toolbox: {
+                    show: true,
+                    fillerColor: '#ffffff',
+                    borderColor: '#ffffff',
+					feature: {
+						dataZoom: {
+							yAxisIndex: 'none'
+						}
+					}
+                },
+			    series: [{
+			        type: 'scatter',
+					symbolSize: 3,
+			        label: {
+			            normal: {
+			                show: false,
+			                position: 'top'
+			            }
+			        },
+					itemStyle: {
+						normal: {
+							color: '#19ff07'
+						}                    },
+                    large: false,
+			        data: []
+			    }]
+			};
+
+			option_origin_PRI = {
+			    backgroundColor: '#000000',
+			    tooltip: {
+			    },
+			    xAxis: {
+			        scale: true,
+			        splitLine: {
+			            show: false
+			        },
+			        axisLine: {
+			            lineStyle: {
+			                color: '#ffffff',
+			                witdh: 5
+			            }
+			        },
+			        axisTick: {
+			            show: false
+			        },
+			        axisLabel: {
+			            show: false
+			        },
+			        name: ''
+			    },
+			    yAxis: {
+			        scale: true,
+			        splitLine: {
+			            show: false
+			        },
+			        axisLine: {
+			            lineStyle: {
+			                color: '#ffffff',
+			                witdh: 5
+			            }
+			        },
+			        nameLocation: 'center',
+			        nameGap: 50,
+			        name: 'PRI(μs)'
+			    },
+			    grid: {
+			        height: 60
+			    },
+			    toolbox: {
+			        show: false,
+			        fillerColor: '#ffffff',
+			        borderColor: '#ffffff',
+			        feature: {
+			            dataZoom: {
+			            }
+			    }
+			},
+			series: [{
+			    type: 'scatter',
+			    symbolSize: 3,
+			    label: {
+			        normal: {
+			            show: false,
+			            position: 'top'
+			        }
+			    },
+			    itemStyle: {
+			        normal: {
+			            color: '#19ff07'
+			        }
+			    },
+			    large: false,
+			    data: []
+			}]
+            };
+
+            option_origin_PW = {
+                backgroundColor: '#000000',
+                tooltip: {
+            },
+            xAxis: {
+                scale: true,
+                splitLine: {
+                    show: false
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#ffffff',
+                        witdh: 5
+                    }
+                },
+                axisTick: {
+                    show: false
+                },
+                axisLabel: {
+                    show: false
+                },
+                name: ''
+            },
+            yAxis: {
+                scale: true,
+                splitLine: {
+                    show: false
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#ffffff',
+                        witdh: 5
+                    }
+                },
+                nameLocation: 'center',
+                nameGap: 50,
+                name: 'PW(μs)'
+            },
+            grid: {
+                height: 60
+            },
+            toolbox: {
+                show: false,
+                fillerColor: '#ffffff',
+                borderColor: '#ffffff',
+                feature: {
+                    dataZoom: {
+                    }
+                }
+            },
+            series: [{
+                type: 'scatter',
+                symbolSize: 3,
+                label: {
+                    normal: {
+                        show: false,
+                        position: 'top'
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        color: '#19ff07'
+                    }
+                },
+                large: false,
+                data: []
+            }]
+            };
+
+            option_origin_DOA = {
+                backgroundColor: '#000000',
+                tooltip: {
+            },
+            xAxis: {
+                scale: true,
+                splitLine: {
+                    show: false
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#ffffff',
+                        witdh: 5
+                    }
+                },
+                axisTick: {
+                    show: false
+                },
+                axisLabel: {
+                    show: false
+                },
+                name: ''
+            },
+            yAxis: {
+                scale: true,
+                splitLine: {
+                    show: false
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#ffffff',
+                        witdh: 5
+                    }
+                },
+                nameLocation: 'center',
+                nameGap: 50,
+                name: 'DOA(度)'
+            },
+            grid: {
+                height: 60
+            },
+            toolbox: {
+                show: false,
+                fillerColor: '#ffffff',
+                borderColor: '#ffffff',
+                feature: {
+                    dataZoom: {
+                }
+            }
+            },
+            series: [{
+                type: 'scatter',
+                symbolSize: 3,
+                label: {
+                    normal: {
+                        show: false,
+                        position: 'top'
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        color: '#19ff07'
+                    }
+                },
+                large: false,
+                data: []
+            }]
+            };
+
+            option_origin_PA = {
+                backgroundColor: '#000000',
+                tooltip: {
+            },
+            xAxis: {
+                scale: true,
+                splitLine: {
+                    show: false
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#ffffff',
+                        witdh: 5
+                    }
+                },
+                axisTick: {
+                    show: true
+                },
+                axisLabel: {
+                    show: true
+                },
+                name: 'TOA(μs)'
+            },
+            yAxis: {
+                scale: true,
+                splitLine: {
+                    show: false
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#ffffff',
+                        witdh: 5
+                    }
+                },
+                nameLocation: 'center',
+                nameGap: 50,
+                name: 'PA(0.25dB)'
+            },
+            grid: {
+                height: 60
+            },
+            toolbox: {
+                show: false,
+                fillerColor: '#ffffff',
+                borderColor: '#ffffff',
+                feature: {
+                    dataZoom: {
+                }
+            }
+            },
+            series: [{
+                type: 'scatter',
+                symbolSize: 3,
+                label: {
+                    normal: {
+                        show: false,
+                        position: 'top'
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        color: '#19ff07'
+                    }
+                },
+                large: false,
+                data: []
+            }]
+            };
+
+			function showLoading() {
+			    myChart_RF.showLoading({ text: 'Loading', color: '#ffffff', textColor: '#ffffff', maskColor: '#808080' });
+			    myChart_PRI.showLoading({ text: 'Loading', color: '#ffffff', textColor: '#ffffff', maskColor: '#808080' });
+			    myChart_PW.showLoading({ text: 'Loading', color: '#ffffff', textColor: '#ffffff', maskColor: '#808080' });
+			    myChart_DOA.showLoading({ text: 'Loading', color: '#ffffff', textColor: '#ffffff', maskColor: '#808080' });
+			    myChart_PA.showLoading({ text: 'Loading', color: '#ffffff', textColor: '#ffffff', maskColor: '#808080' });
+			};
+
+			function setEchartsOption_RF(option, NotMerge) {
+			    var option_origin_obj = option_origin_RF;
+			    var option_obj = JSON.parse(option);
+			    if (option_origin_obj && typeof option_origin_obj === "object") {
+			        if (option_obj["series"]) {
+			            var data = option_obj["series"][0]["data"];
+				        option_origin_obj["series"][0]["data"] = data;
+				        myChart_RF.setOption(option_origin_obj, NotMerge);
+						myChart_RF.hideLoading();
+	                }
+				};
+			};
+			function setEchartsOption_PRI(option, NotMerge) {
+			    var option_origin_obj = option_origin_PRI;
+			    var option_obj = JSON.parse(option);
+			    if (option_origin_obj && typeof option_origin_obj === "object") {
+			        if (option_obj["series"]) {
+			            var data = option_obj["series"][0]["data"];
+				        option_origin_obj["series"][0]["data"] = data;
+						myChart_PRI.setOption(option_origin_obj, NotMerge);
+						myChart_PRI.hideLoading();
+	                }
+				};
+			};
+			function setEchartsOption_PW(option, NotMerge) {
+			    var option_origin_obj = option_origin_PW;
+			    var option_obj = JSON.parse(option);
+			    if (option_origin_obj && typeof option_origin_obj === "object") {
+			        if (option_obj["series"]) {
+			            var data = option_obj["series"][0]["data"];
+				        option_origin_obj["series"][0]["data"] = data;
+						myChart_PW.setOption(option_origin_obj, NotMerge);
+						myChart_PW.hideLoading();
+	                }
+				};
+			};
+			function setEchartsOption_DOA(option, NotMerge) {
+			    var option_origin_obj = option_origin_DOA;
+			    var option_obj = JSON.parse(option);
+			    if (option_origin_obj && typeof option_origin_obj === "object") {
+			        if (option_obj["series"]) {
+			            var data = option_obj["series"][0]["data"];
+				        option_origin_obj["series"][0]["data"] = data;
+						myChart_DOA.setOption(option_origin_obj, NotMerge);
+						myChart_DOA.hideLoading();
+	                }
+				};
+			};
+			function setEchartsOption_PA(option, NotMerge) {
+			    var option_origin_obj = option_origin_PA;
+			    var option_obj = JSON.parse(option);
+			    if (option_origin_obj && typeof option_origin_obj === "object") {
+			        if (option_obj["series"]) {
+			            var data = option_obj["series"][0]["data"];
+				        option_origin_obj["series"][0]["data"] = data;
+						myChart_PA.setOption(option_origin_obj, NotMerge);
+						myChart_PA.hideLoading();
+	                }
+				};
+			};
+			
+			function setEchartsBackgroundImage(imagePath){
+                var dom = document.getElementById("container");
+
+                dom.style.backgroundImage = 'url(' + imagePath + ')';
+                dom.style.backgroundRepeat = ' no-repeat';
+                dom.style.backgroundAttachment = 'fixed';
+                dom.style.backgroundSize = 'cover';
+
+            };
+
+            function setAFTwoValueAxesInPolarWidgetToolTipFormatter(radiusLabel,rUnit,AngleLabel,aUnit){
+                option ={
+                    tooltip:{
+                        formatter: function(params){
+                            var Label = AngleLabel + ": " + params[0].value[1] + aUnit + "<br />" + radiusLabel + ": " + params[0].value[0] + rUnit;
+
+                            return Label;
+                        }
+                    }
+                }
+
+                myChart.setOption(option,false);
+
+                return true;
+            }
+			
+			myChart_RF.on('dataZoom', function (param) {
+				var startValue = param.batch[0].startValue;
+				var endValue = param.batch[0].endValue;
+
+				var option_origin_obj_PRI = option_origin_PRI;
+				option_origin_obj_PRI.xAxis.min = startValue;
+				option_origin_obj_PRI.xAxis.max = endValue;
+				var option_origin_obj_PW = option_origin_PW;
+				option_origin_obj_PW.xAxis.min = startValue;
+				option_origin_obj_PW.xAxis.max = endValue;
+				var option_origin_obj_DOA = option_origin_DOA;
+				option_origin_obj_DOA.xAxis.min = startValue;
+				option_origin_obj_DOA.xAxis.max = endValue;
+				var option_origin_obj_PA = option_origin_PA;
+				option_origin_obj_PA.xAxis.min = startValue;
+				option_origin_obj_PA.xAxis.max = endValue;
+
+				myChart_PRI.setOption(option_origin_obj_PRI, false);
+				myChart_PW.setOption(option_origin_obj_PW, false);
+				myChart_DOA.setOption(option_origin_obj_DOA, false);
+				myChart_PA.setOption(option_origin_obj_PA, false);
+			});
+
+       </script>
+   </body>
+</html>

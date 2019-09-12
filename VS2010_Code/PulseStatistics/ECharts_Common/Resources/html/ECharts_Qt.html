@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+   <head>
+       <meta charset="utf-8">
+   </head>
+
+   <body style="height: 100%; margin: 0">
+       <div id="container" style="position:relative;width:100%;height:100%;margin:0px auto;"></div>
+	   <div id ="mychar"  ></div>
+       <script type="text/javascript" src="../js/echarts/echarts.min.js"></script>
+	   <script type="text/javascript" src="../js/json/cycle.js"></script>
+	   <script type="text/javascript" src="../js/json/json_parse.js"></script>
+	   <script type="text/javascript" src="../js/json/json_parse_state.js"></script>
+	   <script type="text/javascript" src="../js/json/json2.js"></script>
+       <script type="text/javascript">
+	   
+			var dom = document.getElementById("container");
+			var myChart = echarts.init(dom);
+			var colorList = ['#f000ff', '#fff000', '#00ffff', '#ff0000', '#000000'];
+			var last_itemStyles = new JsMap();
+
+			function renderItem(params, api) {
+			    var yValue = api.value(2);
+			    var start = api.coord([api.value(0), yValue]);
+			    var size = api.size([api.value(1) - api.value(0), 50]);
+			    var style = api.style();
+
+			    return {
+			        type: 'rect',
+			        shape: {
+			            x: start[0],
+			            y: start[1],
+			            width: size[0],
+			            height: size[1]
+			        },
+			        style: style
+			    };
+			}
+
+			option_origin = {
+				backgroundColor: '#000000',
+			    title: {
+			        text: '威胁电磁环境频谱',
+			        left: 'center',
+					textStyle: {
+						color: '#ffffff'
+					}
+			    },
+			    tooltip: {
+			    },
+			    xAxis: {
+			        scale: true,
+			        name: 'TOA(μs)',
+					axisLine: {
+						lineStyle: {
+							color: '#ffffff'
+						}
+					}
+			    },
+			    yAxis: {
+			        scale: true,
+			        name: 'RF(MHz)',
+					axisLine: {
+						lineStyle: {
+							color: '#ffffff'
+						}
+					}
+			    },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        restore: {}
+                    }
+                },
+                dataZoom: [{
+                    type: 'inside'
+                }],
+			    series: [{
+			        type: 'custom',
+			        renderItem: renderItem,
+			        label: {
+			            normal: {
+			                show: false,
+			                position: 'top'
+			            }
+			        },
+					itemStyle: {
+						normal: {
+							color: '#19ff07'
+						}
+					},
+			        dimensions: ['start', 'end', 'RF'],
+			        encode: {
+			            x: [0, 1],
+			            y: 2,
+			            tooltip: [0, 1, 2],
+			            itemName: 3
+			        },
+			        data: []
+			    }]
+			};
+
+			function showLoading() {
+			    myChart.showLoading({ text: 'Loading', color: '#ffffff', textColor: '#ffffff', maskColor: '#808080' });
+			};
+
+			function setEchartsOption(option, NotMerge) {
+				myChart.showLoading();
+			    var option_obj = JSON.parse(option);
+			    if (option_origin && typeof option_origin === "object") {
+			        if (option_obj["series"]) {
+			            var data = option_obj["series"][0]["data"];
+			            data = echarts.util.map(data, function (item, index) {
+			                var data_name = item[3];
+			                if (data_name == 'InvalidInit') {
+			                    return {
+			                        value: item,
+			                        itemStyle: {
+			                            normal: {
+			                                color: colorList[4]
+			                            }
+			                        }
+			                    }
+			                } else if (data_name == 'RA') {
+			                    return {
+			                        value: item,
+			                        itemStyle: {
+			                            normal: {
+			                                color: colorList[0]
+			                            }
+			                        }
+			                    }
+			                } else if (data_name == 'RB') {
+			                    return {
+			                        value: item,
+			                        itemStyle: {
+			                            normal: {
+			                                color: colorList[1]
+			                            }
+			                        }
+			                    }
+			                } else if (data_name == 'RC') {
+			                    return {
+			                        value: item,
+			                        itemStyle: {
+			                            normal: {
+			                                color: colorList[2]
+			                            }
+			                        }
+			                    }
+			                } else {
+			                    return {
+			                        value: item,
+			                        itemStyle: {
+			                            normal: {
+			                                color: colorList[3]
+			                            }
+			                        }
+			                    }
+			                };
+			            });
+			            
+				        option_origin["series"][0]["data"] = data;
+				    }
+					myChart.setOption(option_origin, NotMerge);
+					myChart.hideLoading();
+				};
+			};
+
+            function setEchartsBackgroundImage(imagePath){
+                var dom = document.getElementById("container");
+
+                dom.style.backgroundImage = 'url(' + imagePath + ')';
+                dom.style.backgroundRepeat = ' no-repeat';
+                dom.style.backgroundAttachment = 'fixed';
+                dom.style.backgroundSize = 'cover';
+
+            };
+
+            function setAFTwoValueAxesInPolarWidgetToolTipFormatter(radiusLabel,rUnit,AngleLabel,aUnit){
+                option ={
+                    tooltip:{
+                        formatter: function(params){
+                            var Label = AngleLabel + ": " + params[0].value[1] + aUnit + "<br />" + radiusLabel + ": " + params[0].value[0] + rUnit;
+
+                            return Label;
+                        }
+                    }
+                }
+
+                myChart.setOption(option,false);
+
+                return true;
+            }
+			
+			function setEChartsItemHighlight(highlightIndeces) {
+				var highlight_rows = highlightIndeces.split(",");
+				highlight_rows.pop();
+				
+				var data = option_origin["series"][0]["data"];
+				if (!last_itemStyles.isEmpty()) {
+					for (var index = 0; index < data.length; index++) {
+						if (last_itemStyles.has(index)) {
+							data[index].itemStyle = last_itemStyles.get(index);
+							last_itemStyles.remove(index);
+						}
+					}
+				}
+				for (var index = 0; index < data.length; index++) {
+					if (isInHighlightRows(index, highlight_rows)) {
+						last_itemStyles.put(index, data[index].itemStyle);
+						data[index].itemStyle = {
+									normal: {
+										color: '#00ff00',
+										shadowBlur: 50,
+										shadowColor: '#fff000'
+									}
+								};
+					}
+				}
+				
+				option_origin["series"][0]["data"] = data;
+				myChart.setOption(option_origin, false);
+            }
+			
+			myChart.on('click', function (param) {
+				var highlight_item_index = param.dataIndex;
+				data = option_origin["series"][0]["data"];
+				data = echarts.util.map(data, function (item, index) {
+					if (last_itemStyles.has(index)) {
+						var style = last_itemStyles.get(index);
+						last_itemStyles.remove(index);
+						return {
+							value: item.value,
+							itemStyle: style
+						}
+					} else {
+						return item;
+					}
+				});
+				
+				data = echarts.util.map(data, function (item, index) {
+					if (highlight_item_index == index) {
+						last_itemStyles.put(index, item.itemStyle);
+						return {
+							value: item.value,
+							itemStyle: {
+								normal: {
+									color: '#00ff00',
+									shadowBlur: 50,
+									shadowColor: '#00ff66'
+								}
+							}
+						}
+					} else {
+						return item;
+					}
+				});
+				option_origin["series"][0]["data"] = data;
+				myChart.setOption(option_origin, false);
+				
+				mainWindow.HighlightQTableItem(highlight_item_index);
+            });
+			
+			myChart.on('restore', function (param) {
+				data = option_origin["series"][0]["data"];
+				data = echarts.util.map(data, function (item, index) {
+					if (last_itemStyles.has(index)) {
+						var style = last_itemStyles.get(index);
+						last_itemStyles.remove(index);
+						return {
+							value: item.value,
+							itemStyle: style
+						}
+					} else {
+						return item;
+					}
+				});
+				option_origin["series"][0]["data"] = data;
+				myChart.setOption(option_origin, false);
+				mainWindow.HighlightQTableItem(0);
+            });
+			
+			function isInHighlightRows(index, highlight_rows) {
+				for (var i = 0; i < highlight_rows.length; i++) {
+					if (index == highlight_rows[i]) {
+						return true;
+					}
+				}
+				return false;
+			}
+			
+			function isInArray(arr, value) {
+				for (var i = 0; arr.length; i++) {
+					if (value == arr[i]) {
+						return true;
+					}
+				}
+				return false;
+			}
+			
+			Array.prototype.indexOf = function (val) {
+				for (var i = 0; i < this.length; i++) {
+					if (this[i] == val) {
+						return i;
+					}
+				}
+				return -1;
+			};
+			Array.prototype.remove = function (val) {
+				var index = this.indexOf(val);
+				if (index > -1) {
+					this.splice(index, 1);
+				}
+				
+			};
+			
+			function JsMap() {
+				this.elements = new Array();
+				
+				this.size = function() {
+					return this.elements.length;
+				};
+				
+				this.isEmpty = function() {
+					return (this.elements.length < 1);
+				};
+				
+				this.put = function(_key, _value) {
+					this.elements.push({
+						key: _key,
+						value: _value
+					});
+				};
+				
+				this.remove = function(_key) {
+					var bln = false;
+					try {
+						for (var i = 0; i < this.elements.length; i++) {
+							if (this.elements[i].key == _key) {
+								this.elements.splice(i, 1);
+								return true;
+							}
+						}
+					} catch (e) {
+						bln = false;
+					}
+					return bln;
+				};
+				
+				this.get = function(_key) {
+					try {
+						for (var i = 0; i < this.elements.length; i++) {
+							if (this.elements[i].key == _key) {
+								return this.elements[i].value;
+							}
+						}
+					} catch (e) {
+						return null;
+					}
+				};
+				
+				this.has = function(_key) {
+					var bln = false;
+					try {
+						for (var i = 0; i < this.elements.length; i++) {
+							if (this.elements[i].key == _key) {
+								bln = true;
+							}
+						}
+					} catch (e) {
+						bln = false;
+					}
+					return bln;
+				};
+			}
+       </script>
+   </body>
+</html>
